@@ -20,4 +20,6 @@ service_path [ 'services' ]
 cloud_path [ 'clouds' ]
 catalog_path [ 'catalogs' ]
 default_impl 'oo::chef-11.18.12'
-
+object_store_local_root '/home/oleg/IdeaProjects/display/public/images'
+object_store_provider 'Local'
+environment_name 'development'
