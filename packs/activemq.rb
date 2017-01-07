@@ -396,7 +396,7 @@ resource 'user-activemq',
     :attributes => {
       :username => 'activemq',
       :description => 'Activemq User',
-      :home_directory => '/',
+      :home_directory => '/home/activemq',
       :system_account => true,
       :sudoer => true
 }
@@ -409,7 +409,7 @@ resource 'user-activemq',
   {:from => 'volume-externalstorage', :to => 'storage'},
   {:from => 'activemq', :to => 'volume-externalstorage'},
   {:from => 'activemq', :to => 'job'},
-  {:from => 'daemon', :to => 'activemq'}].each do |link|
+  {:from => 'activemq-daemon', :to => 'activemq'}].each do |link|
   relation "#{link[:from]}::depends_on::#{link[:to]}",
   :relation_name => 'DependsOn',
   :from_resource => link[:from],

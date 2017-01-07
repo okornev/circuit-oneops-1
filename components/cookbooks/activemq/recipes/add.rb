@@ -254,7 +254,7 @@ end
 
 ruby_block 'Encryption-Not-Required' do
   block do
-    node[:activemq][:adminencpwd]=node[:activemq][:adminpassword]
+    node.set[:activemq][:adminencpwd] =node[:activemq][:adminpassword]
     JSON.parse(node[:activemq][:users]).each do |key,val|
         encypwdusers["#{key}"] ="#{val}"
      end
@@ -387,6 +387,13 @@ execute "Move API" do
     cwd "#{activemq_home}/webapps"
     command "rm -rf api "
     only_if {node.activemq.restapisupport == 'false' && File.exists?("#{activemq_home}/webapps/api/WEB-INF/web.xml")}
+end
+
+directory "#{node[:activemq][:datapath]}" do
+    mode 00755
+    owner "#{runasuser}"
+    group "#{runasuser}"
+    recursive true
 end
 
 if node.workorder.cloud.ciAttributes.priority == "1"

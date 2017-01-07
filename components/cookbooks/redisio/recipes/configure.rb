@@ -28,17 +28,22 @@ if redis_instances.nil?
 end
 
 redisio_configure "redis-servers" do
-  version redis['version'] if redis['version']
-  if redis['version'] == '2.6.16'
+  version node['redisio']['version'] if node['redisio']['version']
+  if node['redisio']['version'] == '2.6.16'
+	puts "#{node['redisio']['version']}"
       default_settings redis['default_settings']
-  elsif redis['version'] == '3.0.1'
+  elsif node['redisio']['version'] != '2.6.16'
       default_settings redis['cluster_settings']
+	puts "#{node['redisio']['version']}"
   else
       Chef::Log.error("Unknown Version")
   end
   servers redis_instances
   base_piddir redis['base_piddir']
 end
+
+Chef::Log.info("The Redis server version is: #{node['redisio']['version']}")
+puts "#{node['redisio']['version']}"
 
 template '/usr/lib/systemd/system/redis@.service' do
   source    'redis@.service.erb'
@@ -81,10 +86,10 @@ redis_instances.each do |current_server|
 end
 
 redis_instances.each do |current_server|
-  if redis['version'] == '3.0.1'
+  if redis['version'] != '2.6.16'
     execute "config and install redis-cluster binary" do
       cwd "/tmp"
-      command "gem install redis ; cp /tmp/redis-3.0.1/src/redis-trib.rb /usr/local/bin"
+      command "gem install redis ; cp /tmp/redis-#{node['redisio']['version']}/src/redis-trib.rb /usr/local/bin"
     end
   elsif redis['version'] == '2.6.16'
     print "version is 2.6.16"

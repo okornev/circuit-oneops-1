@@ -1,3 +1,8 @@
+if node.platform =~ /windows/
+  include_recipe "user::windows_user_add"
+  return
+end
+
 home_dir = node[:user][:home_directory]
 node.set[:user][:home] = home_dir && !home_dir.empty? ? home_dir : "/home/#{node[:user][:username]}"
 
@@ -20,6 +25,22 @@ group "#{node[:user][:username]}"
 
 
 username = node[:user][:username]
+
+if !JSON.parse(node[:user][:group]).empty?
+JSON.parse(node[:user][:group]).each do |g|
+execute "Adding Secondary Group" do
+  command "groupadd #{g}"
+  not_if "getent group #{g}"
+ end
+end
+
+execute "Adding User to Secondary Group" do
+  command "usermod -G #{JSON.parse(node[:user][:group]).join(",")} #{username}"
+  action :run
+end
+else
+  execute "usermod -G \"\" #{username}"
+end
 
 directory "#{node[:user][:home]}" do
   owner node[:user][:username]

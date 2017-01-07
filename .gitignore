@@ -5,3 +5,16 @@ Gemfile.lock
 .arcconfig
 **/.DS_Store
 .rspec
+.DS_Store
+
+# Berkshelf
+.vagrant
+/cookbooks
+Berksfile.lock
+
+# Bundler
+bin/*
+.bundle/*
+
+.kitchen/
+.kitchen.local.yml
