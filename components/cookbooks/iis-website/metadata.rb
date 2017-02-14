@@ -17,7 +17,7 @@ attribute 'physical_path',
   :description => 'Web Site Physical Path',
   :required    => 'required',
   :format      => {
-    :help      => 'Website physical path',
+    :help      => 'The physical path on disk this Web Site will point to, Default value is set to e:\apps',
     :category  => '1.IIS Web site',
     :order     => 1
   }
@@ -46,7 +46,7 @@ attribute 'binding_type',
   :default     => 'http',
   :required    => 'required',
   :format      => {
-    :help      => 'IIS binding type http or https',
+    :help      => 'Select HTTP/HTTPS bindings that should be added to the IIS Web Site',
     :category  => '1.IIS Web site',
     :order     => 4,
     :form      => { 'field' => 'select',
@@ -68,22 +68,20 @@ attribute 'binding_port',
   }
 
 attribute 'windows_authentication',
-  :description => 'Windows authentiction',
-  :default     => 'true',
-  :required    => 'required',
+  :description => 'Windows authentication',
+  :default     => 'false',
   :format      => {
-    :help      => 'Enable windows authentiction',
+    :help      => 'Enable windows authentication',
     :category  => '1.IIS Web site',
     :form     => {'field' => 'checkbox'},
     :order     => 6
   }
 
 attribute 'anonymous_authentication',
-  :description => 'Anonymous authentiction',
+  :description => 'Anonymous authentication',
   :default     => 'true',
-  :required    => 'required',
   :format      => {
-    :help      => 'Enable anonymous authentiction',
+    :help      => 'Enable anonymous authentication',
     :category  => '1.IIS Web site',
     :form     => {'field' => 'checkbox'},
     :order     => 7
@@ -94,7 +92,7 @@ attribute 'runtime_version',
 :required    => 'required',
 :default     => 'v4.0',
 :format      => {
-  :help      => 'The version of .Net CLR runtime that the appplication pool will use',
+  :help      => 'The version of .Net CLR runtime that the application pool will use',
   :category  => '2.IIS Application Pool',
   :order     => 1,
   :form      => { 'field' => 'select',
@@ -103,7 +101,7 @@ attribute 'runtime_version',
 }
 
 attribute 'identity_type',
-  :description => 'Indentity type',
+  :description => 'Identity type',
   :required    => 'required',
   :default     => 'ApplicationPoolIdentity',
   :format      => {
@@ -114,10 +112,33 @@ attribute 'identity_type',
                     'options_for_select' => [
                       ['Application Pool Identity', 'ApplicationPoolIdentity'],
                       ['Network Service', 'NetworkService'],
-                      ['Local Service', 'LocalService']
+                      ['Local Service', 'LocalService'],
+                      ['Specific User', 'SpecificUser']
                     ]
                   }
   }
+
+attribute 'process_model_user_name',
+  :description => 'Username',
+  :default     => '',
+  :format      => {
+  :help        => 'The user name of the account which application pool will use',
+    :category  => '2.IIS Application Pool',
+    :order     => 3,
+    :filter    => {'all' => {'visible' => 'identity_type:eq:SpecificUser'}}
+  }
+
+attribute 'process_model_password',
+  :description => 'Password',
+  :encrypted   => true,
+  :default     => '',
+  :format      => {
+  :help        => 'Password for the user account',
+    :category  => '2.IIS Application Pool',
+    :order     => 4,
+    :filter    => {'all' => {'visible' => 'identity_type:eq:SpecificUser'}}
+  }
+
 
 attribute 'enable_static_compression',
   :description => 'Enable static compression',
@@ -247,7 +268,7 @@ attribute 'dc_level',
   }
 
 attribute 'dc_mime_types',
-  :description => 'Minimum file size to compression',
+  :description => 'Mime type(s)',
   :default     => '{
     "text/*":"true",
     "message/*":"true",
@@ -310,7 +331,7 @@ attribute 'session_state_cookieless',
   :description => 'Cookieless',
   :default     => 'UseCookies',
   :format      => {
-    :help      => 'Specifies whether dynamic compression is enabled for URLs',
+    :help      => 'Specifies how cookies are used for a Web application.',
     :category  => '5.Session State',
     :form        => { 'field' => 'select',
                     'options_for_select' => [['Use URI', 'UseURI'], ['Use Cookies', 'UseCookies'],
@@ -323,7 +344,7 @@ attribute 'session_state_cookie_name',
   :description => 'Cookie name',
   :default     => 'ASP.NET_SessionId',
   :format      => {
-    :help      => 'Specifies whether static compression is enabled for URLs.',
+    :help      => 'Specifies the name of the cookie that stores the session identifier.',
     :category  => '5.Session State',
     :order     => 2
   }
@@ -380,7 +401,7 @@ attribute 'requestfiltering_max_url',
   :description => 'Maximum url length',
   :default     => '4096',
   :format      => {
-    :help      => 'Specifies the maximum length of the query string, in bytes.',
+    :help      => 'Specifies the maximum length of the URL, in bytes.',
     :category  => '6.Request filtering',
     :order     => 5
   }
@@ -389,7 +410,7 @@ attribute 'requestfiltering_max_query_string',
   :description => 'Maximum query string length',
   :default     => '2048',
   :format      => {
-    :help      => 'Specifies the maximum length of the URL, in bytes.',
+    :help      => 'Specifies the maximum length of the query string, in bytes.',
     :category  => '6.Request filtering',
     :order     => 6
   }
