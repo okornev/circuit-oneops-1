@@ -35,6 +35,11 @@ entries = Array.new
 
 # used to prevent full,short aliases on hostname entries
 is_hostname_entry = false
+
+if !node.workorder.payLoad.has_key?(:DependsOn)
+  fail_with_fault "missing DependsOn payload"
+end
+
 lbs = node.workorder.payLoad.DependsOn.select { |d| d[:ciClassName] =~ /Lb/ }
 
 if node.workorder.payLoad.has_key?("Entrypoint")
@@ -62,7 +67,7 @@ else
   else
 
     if os.size > 1
-      fail_with_error "unsupported usecase - need to check why there are multiple os for same fqdn"
+      fail_with_fault "unsupported usecase - need to check why there are multiple os for same fqdn"
     end
     is_hostname_entry = true
     ci = os.first
@@ -99,12 +104,7 @@ end
 
 
 if service_attrs[:cloud_dns_id].nil? || service_attrs[:cloud_dns_id].empty?
-  fail_with_error "no cloud_dns_id for dns cloud service: #{cloud_service[:nsPath]} #{cloud_service[:ciName]}"
-end
-
-
-if !node.workorder.payLoad.has_key?(:DependsOn)
-  fail_with_error "missing DependsOn payload"
+  fail_with_fault "no cloud_dns_id for dns cloud service: #{cloud_service[:nsPath]} #{cloud_service[:ciName]}"
 end
 
 # values using DependsOn's dns_record attr
@@ -146,7 +146,7 @@ if node.workorder.rfcCi.ciAttributes.has_key?("ptr_enabled") &&
   end
 
   values.each do |ip|
-    next unless ip =~ /^\d+\.\d+\.\d+\.\d+$/
+    next unless ip =~ /^\d+\.\d+\.\d+\.\d+$/ || ip =~ Resolv::IPv6::Regex
     ptr = {:name => ip, :values => ptr_value.downcase}
     Chef::Log.info("ptr: #{ptr.inspect}")
     entries.push(ptr)
@@ -180,7 +180,7 @@ else
   
   is_a_record = false
   value_array.each do |val|
-    if val =~ /^\d+\.\d+\.\d+\.\d+$/
+    if val =~ /^\d+\.\d+\.\d+\.\d+$/ || val =~ Resolv::IPv6::Regex
       is_a_record = true
     end
   end

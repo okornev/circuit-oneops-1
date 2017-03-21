@@ -62,9 +62,11 @@ attribute 'build_version',
           :required => "required",
           :default => "70",
           :format => {
+            :important => true,
             :category => '1.Global',
-            :help => 'Tomcat minor version number. Example: Version=7, Build Version=70 will install Tomcat 7.0.70',
-            :order => 5
+            :help => 'Tomcat minor version number.  Example: Version=7, Build Version=75 will install Tomcat 7.0.75',
+            :order => 5,
+            :form => {'field' => 'select', 'options_for_select' => [['42', '42'], ['62', '62'], ['67', '67'], ['68', '68'], ['70', '70'], ['72', '72'], ['73', '73'], ['75', '75']]}
           }
 
 

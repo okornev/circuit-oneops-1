@@ -7,11 +7,23 @@ if node[:workorder][:services].has_key?("windows-domain")
   $password = '#{domain[:password]}'| ConvertTo-SecureString -asPlainText -Force
   $username = '#{domain[:domain]}\\#{domain[:username]}'
   $credential = New-Object System.Management.Automation.PSCredential($username,$password)
+  $currentname = (Get-WmiObject -Class Win32_ComputerSystem).DNSHostName
   $newname = '#{node.vmhostname}'
-  Rename-Computer -NewName $newname -Force -ErrorAction Stop
-  Add-Computer -DomainName $domain -Credential $credential -Force -Options JoinWithNewName -ErrorAction Stop
-  Start-Sleep -s 10"
 
+  #Generate OU path
+  $oupath = 'OU=Servers,'
+  foreach ($a in $domain.Split('.')) { $oupath += 'DC='+$a + ',' }
+  $oupath = $oupath.Substring(0,$oupath.Length-1)
+
+  If ($currentname -ne $newname) 
+  { Rename-Computer -NewName $newname -Force 
+    try { Add-Computer -DomainName $domain -Credential $credential -Force -Options JoinWithNewName -ErrorAction Stop -OUPath $oupath }
+    catch { Add-Computer -DomainName $domain -Credential $credential -NewName $newname -Force -ErrorAction Stop -OUPath $oupath }  }
+  Else
+  { Add-Computer -DomainName $domain -Credential $credential -Force -ErrorAction Stop -OUPath $oupath }  
+  
+  Start-Sleep -s 10"  
+  
   execute 'mkpasswd-oneops' do
     command 'mkpasswd -l -u oneops > /etc/passwd'
 	action :nothing
