@@ -8,6 +8,8 @@ category "Web Application"
 environment "single", {}
 environment "redundant", {}
 
+platform :attributes => {'autocomply' => 'true'}
+
 variable "platform_deployment",
   :description => 'Downloads the nuget packages',
   :value       => 'e:\platform_deployment'
@@ -51,7 +53,7 @@ resource "dotnetframework",
   :requires     => {
     :constraint => "1..1",
     :help       => "Installs .net frameworks",
-    :services   => '*mirror'
+    :services   => 'compute,*mirror'
   },
   :attributes   => {
     "chocolatey_package_source" => 'https://chocolatey.org/api/v2/',
@@ -170,7 +172,7 @@ resource "nuget-package",
 
 resource "secgroup",
   :attributes => {
-    "inbound" => '[ "22 22 tcp 0.0.0.0/0", "3389 3389 tcp 0.0.0.0/0", "80 80 tcp 0.0.0.0/0"]'
+    "inbound" => '[ "22 22 tcp 0.0.0.0/0", "3389 3389 tcp 0.0.0.0/0", "80 80 tcp 0.0.0.0/0", "443 443 tcp 0.0.0.0/0"]'
   }
 
 resource "os",
